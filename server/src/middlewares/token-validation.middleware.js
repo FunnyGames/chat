@@ -3,7 +3,7 @@ const config = require('config');
 const logger = require('../common/logger')(__filename);
 const security = require('../security/security');
 const moment = require('moment');
-const { jwtCookie } = require('../common/static');
+const { JWT_COOKIE } = require('../common/constants');
 
 module.exports.tokenValidation = (req, res, next) => {
     const token = req.headers['authorization'] || req.headers['Authorization'] || req.cookies['blogger_jwt'];
@@ -18,7 +18,7 @@ module.exports.tokenValidation = (req, res, next) => {
                 const period = new Number(config.get('expirationPeriod'));
                 if (decoded.iat + period < moment().unix()) {
                     logger.warn('Token has expired');
-                    res.clearCookie(jwtCookie); // We delete cookie as it has expired
+                    res.clearCookie(JWT_COOKIE); // We delete cookie as it has expired
                     res.status(401).send({ error: 'Token has expired.', tokenExpired: true });
                     // Client should get tokenExpired and logout the user and redirect to login page
                     return;
@@ -28,7 +28,7 @@ module.exports.tokenValidation = (req, res, next) => {
             next();
         } catch (err) {
             logger.error('Invalid token');
-            res.clearCookie(jwtCookie); // We delete cookie as it has expired
+            res.clearCookie(JWT_COOKIE); // We delete cookie as it has expired
             res.status(400).send({ error: 'Invalid token.', tokenExpired: true })
         }
     } else {
