@@ -44,13 +44,13 @@ module.exports.login = async (username, password) => {
     try {
         let user = await userModel.findOne({ username: username.toLowerCase() });
         if (!user) {
-            logger.warn('Username or password are invalid');
+            logger.warn('Username not found');
             return responseError(c.SERVER_BAD_REQUEST_HTTP_CODE, c.USER_LOGIN_FAILED);
         }
 
         const validPassword = await security.validatePassword(password, user.password);
         if (!validPassword) {
-            logger.warn('Username or password are invalid');
+            logger.warn('Password is invalid');
             return responseError(c.SERVER_BAD_REQUEST_HTTP_CODE, c.USER_LOGIN_FAILED);
         }
 

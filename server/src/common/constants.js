@@ -21,7 +21,7 @@ module.exports.SERVER_OK_HTTP_CODE = 200;
 module.exports.SERVER_BAD_REQUEST_HTTP_CODE = 400;
 module.exports.NOT_AUTHORIZED_HTTP_CODE = 401;
 module.exports.SERVER_NOT_FOUND_HTTP_CODE = 404;
-module.exports.SERVER_ERROR_HTTP_CODE = 412;
+module.exports.SERVER_ERROR_HTTP_CODE = 500;
 module.exports.SERVER_NOT_ALLOWED_HTTP_CODE = 503;
 
 // Route related
