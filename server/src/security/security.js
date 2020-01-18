@@ -20,7 +20,7 @@ module.exports.isPublicUrl = (req) => {
 }
 
 module.exports.generateDesKey = () => {
-    return Math.random().toString(36).replace(/[^a-z]+/g, '');
+    return Math.random().toString(36).replace(/[^0-9a-z]+/g, '').substring(1, 20);
 }
 
 // Hash the password using sha256
