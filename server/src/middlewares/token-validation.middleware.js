@@ -3,7 +3,7 @@ const config = require('config');
 const logger = require('../common/logger')(__filename);
 const security = require('../security/security');
 const moment = require('moment');
-const { JWT_COOKIE } = require('../common/constants');
+const { JWT_COOKIE, NOT_AUTHORIZED_HTTP_CODE, TOKEN_EXPIRED_ERROR, INVALID_TOKEN_ERROR, TOKEN_NOT_PROVIDED_ERROR } = require('../common/constants');
 
 module.exports.tokenValidation = (req, res, next) => {
     const token = req.headers['authorization'] || req.headers['Authorization'] || req.cookies['blogger_jwt'];
@@ -19,7 +19,7 @@ module.exports.tokenValidation = (req, res, next) => {
                 if (decoded.iat + period < moment().unix()) {
                     logger.warn('Token has expired');
                     res.clearCookie(JWT_COOKIE); // We delete cookie as it has expired
-                    res.status(401).send({ error: 'Token has expired.', tokenExpired: true });
+                    res.status(NOT_AUTHORIZED_HTTP_CODE).send({ error: true, message: TOKEN_EXPIRED_ERROR, tokenExpired: true });
                     // Client should get tokenExpired and logout the user and redirect to login page
                     return;
                 }
@@ -29,7 +29,7 @@ module.exports.tokenValidation = (req, res, next) => {
         } catch (err) {
             logger.error('Invalid token');
             res.clearCookie(JWT_COOKIE); // We delete cookie as it has expired
-            res.status(400).send({ error: 'Invalid token.', tokenExpired: true })
+            res.status(NOT_AUTHORIZED_HTTP_CODE).send({ error: true, message: INVALID_TOKEN_ERROR, tokenExpired: true })
         }
     } else {
         // If no token provided then check if it's a public link so guest can enter
@@ -39,6 +39,6 @@ module.exports.tokenValidation = (req, res, next) => {
         }
         // If not public link then return error
         logger.error('Token not provided');
-        res.status(401).send({ error: 'Token not provided.', tokenExpired: true });
+        res.status(NOT_AUTHORIZED_HTTP_CODE).send({ error: true, message: TOKEN_NOT_PROVIDED_ERROR, tokenExpired: true });
     }
 }
