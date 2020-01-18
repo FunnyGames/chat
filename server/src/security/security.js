@@ -19,6 +19,10 @@ module.exports.isPublicUrl = (req) => {
     return false;
 }
 
+module.exports.generateDesKey = () => {
+    return Math.random().toString(36).replace(/[^a-z]+/g, '');
+}
+
 // Hash the password using sha256
 module.exports.crypt = (password) => {
     return sha256(saltPassword(password));

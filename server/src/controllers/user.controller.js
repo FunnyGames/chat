@@ -37,3 +37,20 @@ module.exports.usernameAvailable = async (req, res, next) => {
     let response = await userServices.usernameAvailable(username);
     res.status(response.status).send(response.data);
 }
+
+module.exports.getChatDesKey = async (req, res, next) => {
+    logger.info('getChatDesKey');
+    const userId = req.decoded.uid;
+    const otherUserId = req.body.userId;
+
+    let response = await userServices.getChatDesKey(userId, otherUserId);
+    res.status(response.status).send(response.data);
+}
+
+module.exports.getChatDesKeys = async (req, res, next) => {
+    logger.info('getChatDesKeys');
+    const userId = req.decoded.uid;
+
+    let response = await userServices.getChatDesKeys(userId);
+    res.status(response.status).send(response.data);
+}

@@ -1,5 +1,6 @@
 const logger = require('../common/logger')(__filename);
 const userModel = require('../models/user.model');
+const userToUserModel = require('../models/key.model');
 const security = require('../security/security');
 const { responseSuccess, responseError } = require('../common/service-response');
 const c = require('../common/constants');
@@ -87,6 +88,80 @@ module.exports.usernameAvailable = async (username) => {
             error,
             message
         };
+    } catch (e) {
+        logger.error(e.message);
+        return responseError(c.SERVER_ERROR_HTTP_CODE, c.SERVER_ERROR);
+    }
+    return responseSuccess(response);
+}
+
+module.exports.getChatDesKey = async (userId, otherUserId) => {
+    logger.info('getChatDesKey - userId: ' + userId + ', otherUserId: ' + otherUserId);
+
+    let response = {};
+    try {
+        if (userId === otherUserId) {
+            logger.error('User ids are identical');
+            return responseError(c.SERVER_BAD_REQUEST_HTTP_CODE, c.USER_IDS_IDENTICAL);
+        }
+
+        let user = await userModel.findOne({ _id: otherUserId });
+        if (!user) {
+            logger.error('User not found');
+            return responseError(c.SERVER_NOT_FOUND_HTTP_CODE, c.USER_NOT_FOUND);
+        }
+
+        let condition = {
+            $or: [
+                {
+                    user1: userId,
+                    user2: otherUserId
+                },
+                {
+                    user1: otherUserId,
+                    user2: userId
+                }
+            ]
+        };
+
+        let res = await userToUserModel.findOne(condition);
+
+        if (!res) {
+            let data = {
+                user1: userId,
+                user2: otherUserId,
+                key: security.generateDesKey()
+            };
+            res = await userToUserModel.create(data);
+        }
+
+        response = { key: res.key };
+    } catch (e) {
+        logger.error(e.message);
+        return responseError(c.SERVER_ERROR_HTTP_CODE, c.SERVER_ERROR);
+    }
+    return responseSuccess(response);
+}
+
+module.exports.getChatDesKeys = async (userId) => {
+    logger.info('getChatDesKeys - userId: ' + userId);
+
+    let response = {};
+    try {
+        let condition = {
+            $or: [
+                {
+                    user1: userId
+                },
+                {
+                    user2: userId
+                }
+            ]
+        };
+
+        let res = await userToUserModel.find(condition).select('key user1 user2 -_id');
+
+        response = { keys: res };
     } catch (e) {
         logger.error(e.message);
         return responseError(c.SERVER_ERROR_HTTP_CODE, c.SERVER_ERROR);

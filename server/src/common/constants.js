@@ -29,3 +29,4 @@ module.exports.USERNAME_AVAILABLE_FAILED = `Username is unavailable.`;
 module.exports.USER_LOGIN_FAILED = `Username or password are invalid.`;
 module.exports.USERNAME_AVAILABLE_OK = `Username is available.`;
 module.exports.USER_LOGGED_OUT = `User is not logged in.`;
+module.exports.USER_IDS_IDENTICAL = `User ids are identical.`;
