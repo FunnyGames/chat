@@ -1,0 +1,5 @@
+{
+    "jwtPrivateKey": "myPrivateKey",
+    "db": "mongodb://localhost/db_chat",
+    "expirationPeriod": "2592000"
+}
