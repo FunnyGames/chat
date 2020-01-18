@@ -1,0 +1,8 @@
+.DS_STORE
+
+# Server ignores
+server/node_modules
+server/logs
+
+# Client ignores
+client/node_modules
