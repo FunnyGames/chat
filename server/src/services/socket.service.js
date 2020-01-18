@@ -17,9 +17,9 @@ module.exports.getSocketId = (userId) => {
     return userModel.findOne({ _id: userId }).select('socketId');
 }
 
-module.exports.getChatList = (userId) => {
-    logger.info(`getChatList - userId: ${userId}`);
-    return userModel.find({ socketId: { $ne: userId } }).select('username online _id');
+module.exports.getChatList = (socketId) => {
+    logger.info(`getChatList - socketId: ${socketId}`);
+    return userModel.find({ socketId: { $ne: socketId } }).select('username online _id');
 }
 
 module.exports.insertMessages = (data) => {
