@@ -51,7 +51,7 @@ class ChatHttpServer {
     checkUsernameAvailability(username) {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.post('http://localhost:5000/usernameAvailable', {
+                const response = await axios.post('http://localhost:5000/available', {
                     username: username
                 });
                 resolve(response.data);

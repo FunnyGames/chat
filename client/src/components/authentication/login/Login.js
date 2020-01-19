@@ -1,74 +1,48 @@
-import React, { Component } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import ChatHttpServer from '../../../services/ChatHttpServer';
 import './Login.css';
 
-class Login extends Component {
+const Login = (props) => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            username: '',
-            password: ''
-        };
-    }
-
-    handleLogin = async (event) => {
+   const handleLogin = async (event) => {
         event.preventDefault();
-        this.props.loadingState(true);
+        props.setLoadingState(true);
         try {
-            const response = await ChatHttpServer.login(this.state);
-            this.props.loadingState(false);
-            if (response.error) {
-                alert('Invalid login details')
-            } else {
-                ChatHttpServer.setLS('userid', response.userId);
-                this.props.history.push(`/chat`)
-            }
+            const response = await ChatHttpServer.login({username: username, password: password });
+            props.setLoadingState(false);
+            setError('')
+            ChatHttpServer.setLS('userid', response.userId);
+            props.history.push(`/chat`)
         } catch (error) {
-            this.props.loadingState(false);
-            alert('Invalid login details')
+            props.setLoadingState(false);
+            setError(error.response.data.message)
         }
     }
 
-    handleInputChange = (event) => {
-        this.setState({
-            [event.target.name]: event.target.value
-        });
-    }
-
-    render() {
-        return (
-            <Form className="auth-form">
-                <Form.Group controlId="loginUsername">
-                    <Form.Control
-                        type="text"
-                        name="username"
-                        placeholder="Enter username"
-                        onChange={
-                            this.handleInputChange
-                        }
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="loginPassword">
-                    <Form.Control
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        onChange={
-                            this.handleInputChange
-                        }
-                    />
-                </Form.Group>
-                <Button variant="primary" type="submit" onClick={this.handleLogin}>
-                    Login
-        </Button>
-            </Form>
-        );
-    }
+    return (
+        <div className="container">
+            {error.trim() !== "" ? <p>{error}</p> : null}
+            <input 
+                className="input"
+                placeholder="Enter username" 
+                value={username}
+                onChange={(e) => { setUsername(e.target.value)}}/>
+            <input 
+                className="input"
+                placeholder="Password" 
+                type="password"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value)}}/>
+            <button
+                className="button"
+                onClick={handleLogin}>Login</button>
+        </div>
+    );
 }
 
 export default withRouter(Login)

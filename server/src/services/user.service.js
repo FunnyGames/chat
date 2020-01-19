@@ -19,7 +19,8 @@ module.exports.register = async (username, password) => {
         password = await security.crypt(password);
         let data = {
             username,
-            password
+            password,
+            online: 'Y'
         };
 
         user = await userModel.create(data);

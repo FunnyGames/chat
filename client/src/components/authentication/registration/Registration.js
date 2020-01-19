@@ -1,111 +1,50 @@
-import React, { Component } from 'react';
-import { Alert, Form, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
 import { withRouter } from 'react-router-dom';
-import { DebounceInput } from 'react-debounce-input';
 
 import ChatHttpServer from '../../../services/ChatHttpServer';
 import './Registration.css';
 
-class Registration extends Component {
+const Registration = (props) =>  {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            username: '',
-            password: '',
-            usernameAvailable: true
-        };
-    }
 
-    handleRegistration = async (event) => {
+    const handleRegistration = async (event) => {
         event.preventDefault();
-        this.props.loadingState(true);
+        props.loadingState(true);
         try {
-            const response = await ChatHttpServer.register(this.state);
-            this.props.loadingState(false);
-            if (response.error) {
-                alert('Unable to register, try after some time.')
-            } else {
-                ChatHttpServer.setLS('userid', response.userId);
-                this.props.history.push(`/chat`);
-            }
+            const response = await ChatHttpServer.register({username: username, password :password });
+            props.loadingState(false);
+            setError('');
+            ChatHttpServer.setLS('userid', response.userId);
+            props.history.push(`/chat`)
         } catch (error) {
-            this.props.loadingState(false);
-            alert('Unable to register, try after some time.')
+            props.setLoadingState(false);
+            setError(error.response.data.message)
+            
         }
     }
 
-    checkUsernameAvailability = async (event) => {
-        if (event.target.value !== '' && event.target.value !== undefined) {
-            this.setState({
-                username: event.target.value
-            });
-            this.props.loadingState(true);
-            try {
-                const response = await ChatHttpServer.checkUsernameAvailability(this.state.username);
-                this.props.loadingState(false);
-                if (response.error) {
-                    this.setState({
-                        usernameAvailable: false
-                    });
-                } else {
-                    this.setState({
-                        usernameAvailable: true
-                    });
-                }
-            } catch (error) {
-                this.props.loadingState(false);
-                this.setState({
-                    usernameAvailable: false
-                });
-            }
-        } else if (event.target.value === '') {
-            this.setState({
-                usernameAvailable: true
-            });
-        }
-    }
-
-    handleInputChange = (event) => {
-        this.setState({
-            [event.target.name]: event.target.value
-        });
-    }
-
-    render() {
-        return (
-            <Form className="auth-form">
-                <Form.Group controlId="formUsername">
-                    <DebounceInput
-                        className="form-control"
-                        placeholder="Enter username"
-                        minLength={2}
-                        debounceTimeout={300}
-                        onChange={this.checkUsernameAvailability} />
-                    <Alert className={{
-                        'username-availability-warning': true,
-                        'visibility-hidden': this.state.usernameAvailable
-                    }} variant="danger">
-                        <strong>{this.state.username}</strong> is already taken, try another username.
-          </Alert>
-                </Form.Group>
-
-                <Form.Group controlId="formPassword">
-                    <Form.Control
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        onChange={
-                            this.handleInputChange
-                        }
-                    />
-                </Form.Group>
-                <Button variant="primary" type="submit" onClick={this.handleRegistration}>
-                    Registration
-        </Button>
-            </Form>
-        );
-    }
+    return (
+        <div className="container">
+            {error.trim() !== "" ? <p>{error}</p> : null}
+            <input 
+                className="input"
+                placeholder="Enter username" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}/>
+            <input 
+                className="input"
+                placeholder="Password" 
+                type="password"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value)}}/>
+            <button
+                className="button"
+                onClick={handleRegistration}>Registration</button>
+        </div>
+    );
 }
 
 export default withRouter(Registration)

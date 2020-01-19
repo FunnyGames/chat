@@ -147,6 +147,7 @@ class Chat extends Component {
     }
 
     logout = async () => {
+        console.log('testtttt')
         try {
             await ChatHttpServer.removeLS();
             ChatSocketServer.logout({

@@ -2,6 +2,8 @@
     padding: 15% 2% 0px 2%;
     width:50%;
     margin: 0px auto;
+    display: flex;
+    justify-content: center;
 }
 
 .auth-form {
@@ -10,11 +12,48 @@
     margin-top: 2%;
 }
 
-.nav-pills .nav-link {
-    width: 50%;
-    text-align: center;
+.auth-nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    
 }
 
-.auth-loading {
-    left: 0;
+.auth-container {
+    max-width: 500px;
+    width: 100%;
+}
+.nav-button {
+    width: fit-content;
+}
+
+.nav-button:hover{
+    cursor: pointer;
+}
+
+.form-container {
+    border-top: solid 1px #dee2e6;
+    margin-top: 2%;
+    height: 200px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    max-width: 200px;
+    max-height: 100%;
+
+}
+
+.input{
+    margin-top: 20px;
+    height: 35px;
+    padding: 0 10px;
+    font-size: 17px;
+    border: 1px solid #a6a6a6;
+}
+
+.button {
+    margin-top: 20px;
+    height: 35px;
 }
