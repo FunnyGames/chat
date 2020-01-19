@@ -11,9 +11,10 @@ const Message = ({ message, isMe }) => {
     let date = message.createDate;
     let classMessage = isMe ? 'green ' : 'yellow ';
     classMessage += 'ui message';
+    let float = isMe ? 'right' : 'left';
     return (
-        <div style={{ width: 'max-content', paddingTop: '0.5em' }}>
-            <div key={message._id} className={classMessage} style={{ width: 'fit-content' }}>
+        <div style={{ paddingTop: '0.5em', overflow: 'auto' }}>
+            <div className={classMessage} style={{ width: 'max-content', float }}>
                 <div className="content">
                     {content}
                 </div>
