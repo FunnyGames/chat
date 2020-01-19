@@ -12,7 +12,7 @@ module.exports.register = async (req, res, next) => {
         res.status(response.status).send(response.data);
     } else {
         res.cookie(JWT_COOKIE, response.data.jwt);
-        res.send({ ok: 1 });
+        res.send({ userId: response.data.userId });
     }
 }
 
@@ -26,7 +26,7 @@ module.exports.login = async (req, res, next) => {
         res.status(response.status).send(response.data);
     } else {
         res.cookie(JWT_COOKIE, response.data.jwt);
-        res.send({ ok: 1 });
+        res.send({ userId: response.data.userId });
     }
 }
 
@@ -52,5 +52,13 @@ module.exports.getChatDesKeys = async (req, res, next) => {
     const userId = req.decoded.uid;
 
     let response = await userServices.getChatDesKeys(userId);
+    res.status(response.status).send(response.data);
+}
+
+module.exports.checkSession = async (req, res, next) => {
+    logger.info('checkSession');
+    const userId = req.decoded.uid;
+
+    let response = await userServices.checkSession(userId);
     res.status(response.status).send(response.data);
 }

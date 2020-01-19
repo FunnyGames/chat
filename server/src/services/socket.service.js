@@ -2,32 +2,73 @@ const logger = require('../common/logger')(__filename);
 const userModel = require('../models/user.model');
 const messageModel = require('../models/message.model');
 
-module.exports.addSocketId = ({ userId, socketId }) => {
+module.exports.addSocketId = async ({ userId, socketId }) => {
     logger.info(`addSocketId - userId: ${userId}, socketId: ${socketId}`);
-    return userModel.updateOne({ _id: userId }, { $set: { socketId, online: 'Y' } });
+    let res = null;
+    try {
+        res = await userModel.updateOne({ _id: userId }, { $set: { socketId, online: 'Y' } });
+    } catch (error) {
+        logger.error(error);
+    }
+    return res;
 }
 
-module.exports.getUserInfo = (userId) => {
+module.exports.getUserInfo = async (userId) => {
     logger.info(`getUserInfo - userId: ${userId}`);
-    return userModel.findOne({ _id: userId }).select('username online _id');
+    let res = null;
+    try {
+        res = await userModel.findOne({ _id: userId }).select('username online _id');
+    } catch (error) {
+        logger.error(error);
+    }
+    return res;
 }
 
-module.exports.getSocketId = (userId) => {
+module.exports.getSocketId = async (userId) => {
     logger.info(`getSocketId - userId: ${userId}`);
-    return userModel.findOne({ _id: userId }).select('socketId');
+    let res = null;
+    try {
+        res = await userModel.findOne({ _id: userId }).select('socketId');
+        if (!res) {
+            logger.error('User not found');
+            return null;
+        }
+        res = res.socketId;
+    } catch (error) {
+        logger.error(error);
+    }
+    return res;
 }
 
-module.exports.getChatList = (socketId) => {
+module.exports.getChatList = async (socketId) => {
     logger.info(`getChatList - socketId: ${socketId}`);
-    return userModel.find({ socketId: { $ne: socketId } }).select('username online _id');
+    let res = null;
+    try {
+        res = await userModel.find({ socketId: { $ne: socketId } }).select('username online _id');
+    } catch (error) {
+        logger.error(error);
+    }
+    return res;
 }
 
-module.exports.insertMessages = (data) => {
+module.exports.insertMessages = async (data) => {
     logger.info(`insertMessages - data: ${JSON.stringify(data)}`);
-    return messageModel.insertOne(data);
+    let res = null;
+    try {
+        res = await messageModel.insertMany([data]);
+    } catch (error) {
+        logger.error(error);
+    }
+    return res;
 }
 
-module.exports.logout = (userId) => {
+module.exports.logout = async (userId) => {
     logger.info(`logout - userId: ${userId}`);
-    return userModel.updateOne({ _id: userId }, { $set: { online: 'N' } });
+    let res = null;
+    try {
+        res = await userModel.updateOne({ _id: userId }, { $set: { online: 'N' } });
+    } catch (error) {
+        logger.error(error);
+    }
+    return res;
 }

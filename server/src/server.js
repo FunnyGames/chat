@@ -4,7 +4,6 @@ const logger = require('./common/logger')(__filename);
 const http = require('http');
 const socketio = require('socket.io');
 const db = require('./startup/db');
-const configMiddleware = require('./startup/middlewares');
 
 logger.info('Starting server...');
 
@@ -18,7 +17,7 @@ async function connectDB() {
 connectDB();
 
 require('./startup/validation')();
-configMiddleware.configure(app);
+require('./startup/middlewares')(app);
 require('./startup/routes.js')(app);
 require('./startup/config')();
 

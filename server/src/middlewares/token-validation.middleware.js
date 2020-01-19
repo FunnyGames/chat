@@ -6,7 +6,7 @@ const moment = require('moment');
 const { JWT_COOKIE, NOT_AUTHORIZED_HTTP_CODE, TOKEN_EXPIRED_ERROR, INVALID_TOKEN_ERROR, TOKEN_NOT_PROVIDED_ERROR } = require('../common/constants');
 
 module.exports.tokenValidation = (req, res, next) => {
-    const token = req.headers['authorization'] || req.headers['Authorization'] || req.cookies['blogger_jwt'];
+    const token = req.headers['authorization'] || req.headers['Authorization'] || req.cookies[JWT_COOKIE];
     logger.info('tokenValidation');
     if (token) {
         try {

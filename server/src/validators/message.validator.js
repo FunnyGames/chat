@@ -7,6 +7,7 @@ const jUserId = Joi.objectId();
 module.exports.getMessages = (req, res, next) => {
     logger.info('getMessages');
     const schema = {
+        userId: jUserId,
         toUserId: jUserId.required()
     };
 

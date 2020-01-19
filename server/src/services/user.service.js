@@ -30,7 +30,7 @@ module.exports.register = async (username, password) => {
 
         let jwt = security.signJwt(jwtData);
 
-        response = { jwt };
+        response = { jwt, userId: user._id };
     } catch (e) {
         logger.error(e.message);
         return responseError(c.SERVER_ERROR_HTTP_CODE, c.SERVER_ERROR);
@@ -61,7 +61,9 @@ module.exports.login = async (username, password) => {
 
         let jwt = security.signJwt(jwtData);
 
-        response = { jwt };
+        await userModel.updateOne({ _id: user._id }, { $set: { online: 'Y' } });
+
+        response = { jwt, userId: user._id };
     } catch (e) {
         logger.error(e.message);
         return responseError(c.SERVER_ERROR_HTTP_CODE, c.SERVER_ERROR);
@@ -162,6 +164,25 @@ module.exports.getChatDesKeys = async (userId) => {
         let res = await userToUserModel.find(condition).select('key user1 user2 -_id');
 
         response = { keys: res };
+    } catch (e) {
+        logger.error(e.message);
+        return responseError(c.SERVER_ERROR_HTTP_CODE, c.SERVER_ERROR);
+    }
+    return responseSuccess(response);
+}
+
+module.exports.checkSession = async (userId) => {
+    logger.info('checkSession - userId: ' + userId);
+
+    let response = {};
+    try {
+        let res = await userModel.findOne({ _id: userId, online: 'Y' }).select('username -_id');
+        if (!res) {
+            logger.error('User is not online');
+            return responseError(c.SERVER_BAD_REQUEST_HTTP_CODE, c.USER_LOGGED_OUT);
+        }
+
+        response = { username: res.username };
     } catch (e) {
         logger.error(e.message);
         return responseError(c.SERVER_ERROR_HTTP_CODE, c.SERVER_ERROR);

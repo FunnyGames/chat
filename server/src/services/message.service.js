@@ -20,9 +20,9 @@ module.exports.getMessages = async (userId, toUserId) => {
                 }
             ]
         };
-        let messages = await messageModel.find(condition).sort('-createDate');
+        let messages = await messageModel.find(condition).sort('createDate');
 
-        response = messages;
+        response = { messages };
     } catch (e) {
         logger.error(e.message);
         return responseError(c.SERVER_ERROR_HTTP_CODE, c.SERVER_ERROR);

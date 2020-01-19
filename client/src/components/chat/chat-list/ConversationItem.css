@@ -1,0 +1,21 @@
+.online {
+    height: 15px;
+    width: 15px;
+    border-radius: 10px;
+    background-color: rgb(0, 255, 42);
+    float: left;
+    margin-right: 1em;
+}
+
+.offline {
+    height: 15px;
+    width: 15px;
+    border-radius: 10px;
+    background-color: rgb(255, 0, 0);
+    float: left;
+    margin-right: 1em;
+}
+
+.selected {
+    background-color: cornflowerblue;
+}
