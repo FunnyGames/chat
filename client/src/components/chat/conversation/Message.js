@@ -14,7 +14,7 @@ const Message = ({ message, isMe }) => {
     let float = isMe ? 'right' : 'left';
     return (
         <div style={{ paddingTop: '0.5em', overflow: 'auto' }}>
-            <div className={classMessage} style={{ width: 'max-content', float }}>
+            <div className={classMessage} style={{ float }}>
                 <div className="content">
                     {content}
                 </div>

@@ -9,6 +9,7 @@ const ChatList = ({ conversations, selectedConversation, onConversationSelect })
         const isSelected = conversation === selectedConversation;
         return (
             <ConversationItem
+                className="item"
                 key={conversation._id}
                 onConversationSelect={onConversationSelect}
                 conversation={conversation}

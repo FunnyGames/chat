@@ -15,6 +15,7 @@ const Conversation = ({ conversation, messages, userId, sendMessage }) => {
         const isMe = userId === msg.fromUserId;
         return (
             <Message
+                key={msg._id}
                 message={msg}
                 isMe={isMe}
             />
@@ -26,7 +27,7 @@ const Conversation = ({ conversation, messages, userId, sendMessage }) => {
             <div className="ui segment">
                 <div className="ui header"><center>{title}</center></div>
                 <div className="ui segment" style={{ maxHeight: '460px', overflow: 'auto' }}>
-                    <div className="ui feed">
+                    <div >
                         {renderedList}
                     </div>
                 </div>

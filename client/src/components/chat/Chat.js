@@ -10,8 +10,8 @@ import Conversation from './conversation/Conversation';
 import './Chat.css';
 
 class Chat extends Component {
-    state = { loadingState: true, conversations: [], selectedConversation: null, messages: [] };
-
+    state = { loadingState: true, conversations: [], selectedConversation: null, messages: [], keys: [], currentKey: '' };
+    
     componentDidMount() {
         this.connectToSocket();
         ChatSocketServer.eventEmitter.on('chat-list-response', this.createChatListUsers);
@@ -24,12 +24,14 @@ class Chat extends Component {
         try {
             this.setRenderLoadingState(true);
             this.userId = await ChatHttpServer.getUserId();
+            let keys = await ChatHttpServer.getKeys();
             const response = await ChatHttpServer.userSessionCheck();
             if (response.error) {
                 this.props.history.push(`/`)
             } else {
                 this.setState({
-                    username: response.username
+                    username: response.username,
+                    keys: keys
                 });
                 ChatHttpServer.setLS('username', response.username);
                 ChatSocketServer.establishSocketConnection(this.userId);
@@ -37,6 +39,7 @@ class Chat extends Component {
             }
             this.setRenderLoadingState(false);
         } catch (error) {
+            console.log(error.response);
             this.setRenderLoadingState(false);
             this.props.history.push(`/`)
         }
@@ -84,8 +87,20 @@ class Chat extends Component {
     setRenderLoadingState = loadingState => {
         this.setState({ loadingState });
     }
+    
+    checkKeys = (userId) => {
+        for(let i = 0; i < this.state.keys.length; i++){
+            if(userId === this.state.keys[i].user1 || userId === this.state.keys[i].user2){
+                return true;
+            }
+        }
+        return false;
+    }
 
-    onConversationSelect = conversation => {
+    onConversationSelect = async conversation => {
+        if(!this.checkKeys(conversation._id)){
+            await ChatHttpServer.getKey(conversation._id);
+        }
         this.setState({ selectedConversation: conversation });
         this.getMessages(conversation);
     };
@@ -147,7 +162,6 @@ class Chat extends Component {
     }
 
     logout = async () => {
-        console.log('testtttt')
         try {
             await ChatHttpServer.removeLS();
             ChatSocketServer.logout({

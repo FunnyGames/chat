@@ -90,6 +90,30 @@ class ChatHttpServer {
                     userId: userId,
                     toUserId: toUserId
                 });
+                //console.log(response);
+                resolve(response.data);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    getKeys(){
+        return new Promise(async (resolve, reject) => {
+            try {
+                const response = await axios.get('http://localhost:5000/users/keys');
+                console.log(response);
+                resolve(response.data);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    getKey(otherUserId){
+        return new Promise(async (resolve, reject) => {
+            try {
+                const response = await axios.post('http://localhost:5000/users/key', {userId: otherUserId});
                 console.log(response);
                 resolve(response.data);
             } catch (error) {
