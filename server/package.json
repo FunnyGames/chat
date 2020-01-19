@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
+    "client": "npm start --prefix ../client",
+    "dev": "concurrently --kill-others \"npm run start\" \"npm run client\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -25,5 +27,8 @@
     "socket.io": "^2.3.0",
     "url-pattern": "^1.0.3",
     "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "concurrently": "^5.0.2"
   }
 }
