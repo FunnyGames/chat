@@ -8,7 +8,7 @@ import './Authentication.css';
 
 const Authentication = () => {
     const [toShow, setToShow] = useState("Registration");
-    const [ loading, setLoading ] = useState(false);
+    const [loading, setLoading] = useState(false);
     const changeToShow = (mode) => {
         setToShow(mode);
     }
@@ -16,7 +16,7 @@ const Authentication = () => {
     return (
         <div >
             <div className="authentication-screen">
-                
+
                 <div className="auth-container">
                     {loading ? <div>Loading . . .</div> : null}
                     <div className="auth-nav">
@@ -26,14 +26,14 @@ const Authentication = () => {
 
                     {toShow === "Login" ? <div className="form-container">
                         Login
-                        <Login loadingState={(loadingState) => {setLoading(loadingState)}} setLoadingState={setLoading} /> 
+                        <Login loadingState={(loadingState) => { setLoading(loadingState) }} setLoadingState={setLoading} />
                     </div> : null}
 
-                    {toShow === "Registration"  ? <div className="form-container">
+                    {toShow === "Registration" ? <div className="form-container">
                         Registration
-                        <Registration setToShow={setToShow} loadingState={(loadingState) => {setLoading(loadingState)}} setLoadingState={setLoading} />
+                        <Registration setToShow={setToShow} loadingState={(loadingState) => { setLoading(loadingState) }} setLoadingState={setLoading} />
                     </div> : null}
-                    
+
                 </div>
             </div>
         </div>

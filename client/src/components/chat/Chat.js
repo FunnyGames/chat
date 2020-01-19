@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from "react-router-dom";
 
+import { decrypt } from '../../utils/Des';
 import ChatSocketServer from '../../services/ChatSocketServer';
 import ChatHttpServer from '../../services/ChatHttpServer';
 
@@ -11,7 +12,7 @@ import './Chat.css';
 
 class Chat extends Component {
     state = { loadingState: true, conversations: [], selectedConversation: null, messages: [], keys: [], currentKey: '' };
-    
+
     componentDidMount() {
         this.connectToSocket();
         ChatSocketServer.eventEmitter.on('chat-list-response', this.createChatListUsers);
@@ -24,7 +25,7 @@ class Chat extends Component {
         try {
             this.setRenderLoadingState(true);
             this.userId = await ChatHttpServer.getUserId();
-            let keys = await ChatHttpServer.getKeys();
+            let { keys } = await ChatHttpServer.getKeys();
             const response = await ChatHttpServer.userSessionCheck();
             if (response.error) {
                 this.props.history.push(`/`)
@@ -52,7 +53,6 @@ class Chat extends Component {
     }
 
     addUserToChatList = (user) => {
-        console.log('addUserToChatList', this.state);
         let count = this.state.conversations.filter(u => u._id === user.info._id);
         let conversations;
         if (count === 0) {
@@ -87,21 +87,22 @@ class Chat extends Component {
     setRenderLoadingState = loadingState => {
         this.setState({ loadingState });
     }
-    
+
     checkKeys = (userId) => {
-        for(let i = 0; i < this.state.keys.length; i++){
-            if(userId === this.state.keys[i].user1 || userId === this.state.keys[i].user2){
-                return true;
+        for (let i = 0; i < this.state.keys.length; i++) {
+            if (userId === this.state.keys[i].user1 || userId === this.state.keys[i].user2) {
+                return this.state.keys[i].key;
             }
         }
         return false;
     }
 
     onConversationSelect = async conversation => {
-        if(!this.checkKeys(conversation._id)){
-            await ChatHttpServer.getKey(conversation._id);
+        let key = this.checkKeys(conversation._id);
+        if (!key) {
+            key = await ChatHttpServer.getKey(conversation._id);
         }
-        this.setState({ selectedConversation: conversation });
+        this.setState({ selectedConversation: conversation, currentKey: key });
         this.getMessages(conversation);
     };
 
@@ -109,6 +110,10 @@ class Chat extends Component {
         try {
             const messageResponse = await ChatHttpServer.getMessages(this.userId, conversation._id);
             if (!messageResponse.error) {
+                for (let i = 0; i < messageResponse.messages.length; ++i) {
+                    let msg = messageResponse.messages[i];
+                    msg.message = decrypt(this.state.currentKey, msg.message);
+                }
                 this.setState({
                     messages: messageResponse.messages,
                 });
@@ -148,14 +153,18 @@ class Chat extends Component {
 
     sendAndUpdateMessages(message) {
         try {
-            ChatSocketServer.sendMessage(message);
-            this.updateMessage(message);
+            let key = this.state.currentKey;
+            ChatSocketServer.sendMessage(key, message);
+            this.setState({
+                messages: [...this.state.messages, message]
+            });
         } catch (error) {
             console.log(error);
         }
     }
 
     updateMessage = (message) => {
+        message.message = decrypt(this.state.currentKey, message.message);
         this.setState({
             messages: [...this.state.messages, message]
         });

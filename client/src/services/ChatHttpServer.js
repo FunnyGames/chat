@@ -98,11 +98,10 @@ class ChatHttpServer {
         });
     }
 
-    getKeys(){
+    getKeys() {
         return new Promise(async (resolve, reject) => {
             try {
                 const response = await axios.get('http://localhost:5000/users/keys');
-                console.log(response);
                 resolve(response.data);
             } catch (error) {
                 reject(error);
@@ -110,10 +109,10 @@ class ChatHttpServer {
         });
     }
 
-    getKey(otherUserId){
+    getKey(otherUserId) {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.post('http://localhost:5000/users/key', {userId: otherUserId});
+                const response = await axios.post('http://localhost:5000/users/key', { userId: otherUserId });
                 console.log(response);
                 resolve(response.data);
             } catch (error) {

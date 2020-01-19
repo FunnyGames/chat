@@ -1,6 +1,6 @@
 import * as io from 'socket.io-client';
+import { encrypt } from '../utils/Des';
 const events = require('events');
-
 
 class ChatSocketServer {
 
@@ -40,8 +40,10 @@ class ChatSocketServer {
         });
     }
 
-    sendMessage(message) {
-        this.socket.emit('add-message', message);
+    sendMessage(key, message) {
+        let msg = { ...message };
+        msg.message = encrypt(key, msg.message);
+        this.socket.emit('add-message', msg);
     }
 
     logout(userId) {
