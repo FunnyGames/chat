@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 
 import './Message.css';
 
@@ -11,11 +12,13 @@ const Message = ({ message, isMe }) => {
     let classMessage = isMe ? 'green ' : 'yellow ';
     classMessage += 'ui message';
     return (
-        <div key={message._id} className={classMessage} style={{ width: 'fit-content' }}>
-            <div className="content">
-                {content}
+        <div style={{ width: 'max-content', paddingTop: '0.5em' }}>
+            <div key={message._id} className={classMessage} style={{ width: 'fit-content' }}>
+                <div className="content">
+                    {content}
+                </div>
+                <div className="date">{moment(date).format('h:m')}</div>
             </div>
-            <div className="date">{date}</div>
         </div>
     );
 };

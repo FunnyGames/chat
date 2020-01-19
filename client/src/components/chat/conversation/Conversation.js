@@ -25,7 +25,7 @@ const Conversation = ({ conversation, messages, userId, sendMessage }) => {
         <div key={conversation._id}>
             <div className="ui segment">
                 <div className="ui header"><center>{title}</center></div>
-                <div className="ui segment">
+                <div className="ui segment" style={{ maxHeight: '460px', overflow: 'auto' }}>
                     <div className="ui feed">
                         {renderedList}
                     </div>
@@ -33,7 +33,7 @@ const Conversation = ({ conversation, messages, userId, sendMessage }) => {
             </div>
             <form className="ui reply form">
                 <div className="field">
-                    <textarea rows="2" placeholder="Write here and press enter to send..." onKeyPress={sendMessage}></textarea>
+                    <textarea rows="2" placeholder="Write here and press enter to send..." onKeyUp={sendMessage}></textarea>
                 </div>
             </form>
         </div>
