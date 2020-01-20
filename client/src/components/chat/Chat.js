@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { withRouter } from "react-router-dom";
+import { withRouter } from 'react-router-dom';
+import { ToastProvider, DefaultToast  } from 'react-toast-notifications'
 
 import { decrypt } from '../../utils/Des';
 import ChatSocketServer from '../../services/ChatSocketServer';
@@ -7,8 +8,10 @@ import ChatHttpServer from '../../services/ChatHttpServer';
 
 import ChatList from './chat-list/ChatList';
 import Conversation from './conversation/Conversation';
+import ToastContainer from './ToastContainer/ToastContainer'
 
 import './Chat.css';
+
 
 class Chat extends Component {
     _isMounted = false;
@@ -227,6 +230,7 @@ class Chat extends Component {
 
     render() {
         return (
+            <ToastProvider components={{ ToastContainer: ToastContainer }} placement="bottom-center">
             <div>
                 <center><h1>Welcome {this.state.username}</h1></center>
                 <div className="ui container" style={{ paddingBottom: '10px' }}><button className="ui button" onClick={this.logout}>Logout</button></div>
@@ -249,6 +253,7 @@ class Chat extends Component {
                                     />
                                 </div>
                                 <div className="eleven wide column">
+                                    <div style={{display: 'flex', 'flexDirection': 'column'}}>
                                     <Conversation
                                         conversation={this.state.selectedConversation}
                                         messages={this.state.messages}
@@ -256,12 +261,14 @@ class Chat extends Component {
                                         sendMessage={this.sendMessage}
                                         errorMessage={this.state.error}
                                     />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 }
             </div>
+            </ToastProvider>
         );
     }
 }

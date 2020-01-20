@@ -1,0 +1,16 @@
+
+.toast-container {
+    z-index: 9000;
+    box-sizing: border-box;
+    max-height: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding: 8px;
+    pointer-events: all;
+    position: fixed;
+    bottom: 207px;
+    left: 63%;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+}

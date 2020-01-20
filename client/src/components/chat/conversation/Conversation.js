@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ScrollableFeed from 'react-scrollable-feed'
 import Message from './Message';
+import uuid from 'uuid';
+import { useToasts } from 'react-toast-notifications'
 
 import './Conversation.css';
 
+
 const Conversation = ({ conversation, messages, userId, sendMessage, errorMessage }) => {
+    const { addToast } = useToasts();
+
+    useEffect(() =>{
+        if(errorMessage !== ""){
+            addToast(errorMessage , { appearance: 'error', placement : 'bottom-center'})
+        }
+    },[errorMessage])
 
     const scrollToBottom = (event) => {
         if (event && event.key === 'Enter' && !event.shiftKey) {
@@ -24,7 +34,7 @@ const Conversation = ({ conversation, messages, userId, sendMessage, errorMessag
         const isMe = userId === msg.fromUserId;
         return (
             <Message
-                key={msg._id}
+                key={uuid()}
                 message={msg}
                 isMe={isMe}
             />
@@ -42,7 +52,6 @@ const Conversation = ({ conversation, messages, userId, sendMessage, errorMessag
                     </ScrollableFeed>
                 </div>
             </div>
-            {errorMessage !== ""?<p>sdfsdfsd</p> : null}
             <form className="ui reply form">
                 <div className="field">
                     <textarea rows="2" placeholder="Write here and press enter to send..." onKeyUp={scrollToBottom}></textarea>
