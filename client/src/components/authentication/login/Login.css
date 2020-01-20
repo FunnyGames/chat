@@ -152,7 +152,9 @@ body {
   top: -2.5%;
   bottom: -2.5%;
 }
-
+.errorText {
+  color: red;
+}
 * {
   box-sizing: border-box;
   cursor: default;
@@ -165,7 +167,7 @@ form {
   border-radius: 0.4em;
   bottom: 0;
   box-shadow: 0 5px 10px 5px rgba(0, 0, 0, 0.2);
-  height: 280px;
+  height: 500px;
   left: 0;
   margin: auto;
   overflow: hidden;

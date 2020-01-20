@@ -4,16 +4,17 @@ import Message from './Message';
 import uuid from 'uuid';
 import { useToasts } from 'react-toast-notifications';
 
-import './Conversation.css';
+import "./Conversation.css";
+import "../Chat.scss";
 
 const Conversation = ({ conversation, messages, userId, sendMessage, errorMessage }) => {
     const { addToast } = useToasts();
 
-    useEffect(() =>{
-        if(errorMessage !== ""){
-            addToast(errorMessage , { appearance: 'error', placement : 'bottom-center', autoDismiss :'true'})
+    useEffect(() => {
+        if (errorMessage !== "") {
+            addToast(errorMessage, { appearance: 'error', placement: 'bottom-center', autoDismiss: 'true' })
         }
-    },[errorMessage])
+    }, [errorMessage])
 
     const scrollToBottom = (event) => {
         if (event && event.key === 'Enter' && !event.shiftKey) {
@@ -44,18 +45,22 @@ const Conversation = ({ conversation, messages, userId, sendMessage, errorMessag
     return (
         <div key={conversation._id}>
             <div className="ui segment">
-                <div className="ui header"><center>{title}</center></div>
-                <div className="ui segment" style={{ maxHeight: '460px' }}>
-                    <ScrollableFeed className="scrollable">
-                        {renderedList}
-                    </ScrollableFeed>
+                <div className="ui header">
+                    <center>{title}</center>
+                </div>
+                <div className="ui segment" style={{ maxHeight: "460px" }}>
+                    <ScrollableFeed className="scrollable">{renderedList}</ScrollableFeed>
                 </div>
             </div>
-            <form className="ui reply form">
-                <div className="field">
-                    <textarea rows="2" placeholder="Write here and press enter to send..." onKeyUp={scrollToBottom}></textarea>
-                </div>
-            </form>
+            <div class="chat-message clearfix">
+                <textarea
+                    name="message-to-send"
+                    id="message-to-send"
+                    placeholder="Type your message and press Enter"
+                    rows="3"
+                    onKeyUp={scrollToBottom}
+                ></textarea>
+            </div>
         </div>
     );
 };
