@@ -25,8 +25,8 @@ const httpServer = http.Server(app);
 const socket = socketio(httpServer);
 require('./socket/socket')(socket);
 
-const port = process.env.PORT || 5000;
-const host = process.env.HOST || `localhost`;
+const port = process.env.SERVER_PORT || 5000;
+const host = process.env.SERVER_HOST || `localhost`;
 httpServer.listen(port, host, () => logger.info(`Listening on http://${host}:${port}...`));
 
 module.exports = httpServer;
