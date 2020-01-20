@@ -25,7 +25,7 @@ class Chat extends Component {
 
     componentWillUnmount() {
         this._isMounted = false;
-      }
+    }
 
     async connectToSocket() {
         try {
@@ -37,7 +37,7 @@ class Chat extends Component {
                 username = response.username;
             }
             const { keys } = await ChatHttpServer.getKeys();
-            if(this._isMounted){
+            if (this._isMounted) {
                 this.setState({
                     username: username,
                     keys: keys
@@ -50,11 +50,12 @@ class Chat extends Component {
         } catch (error) {
             console.log(error.response);
             this.setRenderLoadingState(false);
+            this.props.history.push('/');
         }
     }
 
     createChatListUsers = (chatListResponse) => {
-        if(this._isMounted){
+        if (this._isMounted) {
             this.setState({
                 conversations: chatListResponse.chatList
             });
@@ -62,6 +63,7 @@ class Chat extends Component {
     }
 
     addUserToChatList = (user) => {
+        if (user._id === this.userId) return;
         let count = this.state.conversations.filter(u => u._id === user.info._id);
         let conversations;
         if (count.length === 0) {
@@ -76,7 +78,7 @@ class Chat extends Component {
                 }
             }
         }
-        if(this._isMounted){
+        if (this._isMounted) {
             this.setState({ conversations });
         }
     }
@@ -90,7 +92,7 @@ class Chat extends Component {
                 break;
             }
         }
-        if(this._isMounted){
+        if (this._isMounted) {
             this.setState({
                 conversations: conversations
             });
@@ -98,7 +100,7 @@ class Chat extends Component {
     }
 
     setRenderLoadingState = loadingState => {
-        if(this._isMounted){
+        if (this._isMounted) {
             this.setState({ loadingState });
         }
     }
@@ -118,7 +120,7 @@ class Chat extends Component {
             let res = await ChatHttpServer.getKey(conversation._id);
             key = res.key;
         }
-        if(this._isMounted){
+        if (this._isMounted) {
             this.setState({ selectedConversation: conversation, currentKey: key });
         }
         this.getMessages(conversation);
@@ -132,7 +134,7 @@ class Chat extends Component {
                     let msg = messageResponse.messages[i];
                     msg.message = decrypt(this.state.currentKey, msg.message);
                 }
-                if(this._isMounted){
+                if (this._isMounted) {
                     this.setState({
                         messages: messageResponse.messages,
                     });
@@ -185,7 +187,7 @@ class Chat extends Component {
         try {
             let key = this.state.currentKey;
             ChatSocketServer.sendMessage(key, message);
-            if(this._isMounted){
+            if (this._isMounted) {
                 this.setState({
                     messages: [...this.state.messages, message]
                 });
@@ -201,7 +203,7 @@ class Chat extends Component {
             return;
         }
         message.message = decrypt(this.state.currentKey, message.message);
-        if(this._isMounted){
+        if (this._isMounted) {
             this.setState({
                 messages: [...this.state.messages, message]
             });

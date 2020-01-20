@@ -1,6 +1,7 @@
 const userServices = require('../services/user.service');
 const { JWT_COOKIE, SERVER_OK_HTTP_CODE } = require('../common/constants');
 const logger = require('../common/logger')(__filename);
+const RSA = require('../common/rsa');
 
 module.exports.register = async (req, res, next) => {
     logger.info('register');
@@ -42,17 +43,25 @@ module.exports.getChatDesKey = async (req, res, next) => {
     logger.info('getChatDesKey');
     const userId = req.decoded.uid;
     const otherUserId = req.body.userId;
+    const key = req.headers.key;
+    const exp = req.headers.exp;
 
     let response = await userServices.getChatDesKey(userId, otherUserId);
-    res.status(response.status).send(response.data);
+    let data = JSON.stringify(response.data);
+    let enc = RSA.encryptMessage(data, key, exp);
+    res.status(response.status).send({ msg: enc });
 }
 
 module.exports.getChatDesKeys = async (req, res, next) => {
     logger.info('getChatDesKeys');
     const userId = req.decoded.uid;
+    const key = req.headers.key;
+    const exp = req.headers.exp;
 
     let response = await userServices.getChatDesKeys(userId);
-    res.status(response.status).send(response.data);
+    let data = JSON.stringify(response.data);
+    let enc = RSA.encryptMessage(data, key, exp);
+    res.status(response.status).send({ msg: enc });
 }
 
 module.exports.checkSession = async (req, res, next) => {

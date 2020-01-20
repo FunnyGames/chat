@@ -49,6 +49,10 @@ module.exports.login = async (username, password) => {
             logger.warn('Username not found');
             return responseError(c.SERVER_BAD_REQUEST_HTTP_CODE, c.USER_LOGIN_FAILED);
         }
+        if (user.online === 'Y') {
+            logger.warn('User is online');
+            return responseError(c.SERVER_BAD_REQUEST_HTTP_CODE, c.USER_ALREADY_LOGGED_IN);
+        }
 
         const validPassword = await security.validatePassword(password, user.password);
         if (!validPassword) {

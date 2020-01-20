@@ -1,6 +1,5 @@
-import * as axios from 'axios';
-
-axios.defaults.withCredentials = true;
+import axios from '../utils/axios';
+import Keys from '../utils/Keys';
 
 class ChatHttpServer {
 
@@ -10,6 +9,32 @@ class ChatHttpServer {
                 let userId = localStorage.getItem('userid');
                 let username = localStorage.getItem('username');
                 resolve({ userId, username });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    getLSKeys() {
+        return new Promise((resolve, reject) => {
+            try {
+                let pubExp = localStorage.getItem('publicExp');
+                let pubKey = localStorage.getItem('publicKey');
+                let priKey = localStorage.getItem('privateKey');
+                resolve({ pubExp, pubKey, priKey });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    setLSKeys(keys) {
+        return new Promise((resolve, reject) => {
+            try {
+                localStorage.setItem('publicExp', keys.pubExp);
+                localStorage.setItem('publicKey', keys.pubKey);
+                localStorage.setItem('privateKey', keys.priKey);
+                resolve(true);
             } catch (error) {
                 reject(error);
             }
@@ -42,7 +67,7 @@ class ChatHttpServer {
     login(userCredential) {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.post('http://localhost:5000/users/login', userCredential);
+                const response = await axios.post('/users/login', userCredential);
                 resolve(response.data);
             } catch (error) {
                 reject(error);
@@ -53,7 +78,7 @@ class ChatHttpServer {
     checkUsernameAvailability(username) {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.post('http://localhost:5000/available', {
+                const response = await axios.post('/available', {
                     username: username
                 });
                 resolve(response.data);
@@ -66,7 +91,7 @@ class ChatHttpServer {
     register(userCredential) {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.post('http://localhost:5000/users/register', userCredential);
+                const response = await axios.post('/users/register', userCredential);
                 resolve(response.data);
             } catch (error) {
                 reject(error);
@@ -77,7 +102,7 @@ class ChatHttpServer {
     userSessionCheck() {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.get('http://localhost:5000/users/check');
+                const response = await axios.get('/users/check');
                 resolve(response.data);
             } catch (error) {
                 reject(error);
@@ -88,11 +113,10 @@ class ChatHttpServer {
     getMessages(userId, toUserId) {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.post('http://localhost:5000/messages/get', {
+                const response = await axios.post('/messages/get', {
                     userId: userId,
                     toUserId: toUserId
                 });
-                //console.log(response);
                 resolve(response.data);
             } catch (error) {
                 reject(error);
@@ -103,8 +127,16 @@ class ChatHttpServer {
     getKeys() {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.get('http://localhost:5000/users/keys');
-                resolve(response.data);
+                let keys = await Keys.getKeys();
+                const response = await axios.get('/users/keys', {
+                    headers: {
+                        exp: keys.pubExp,
+                        key: keys.pubKey
+                    }
+                });
+                let data = Keys.decrypt(response.data.msg, keys.priKey, keys.pubKey);
+
+                resolve(data);
             } catch (error) {
                 reject(error);
             }
@@ -114,9 +146,16 @@ class ChatHttpServer {
     getKey(otherUserId) {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.post('http://localhost:5000/users/key', { userId: otherUserId });
-                console.log(response);
-                resolve(response.data);
+                let keys = await Keys.getKeys();
+                const response = await axios.post('/users/key', { userId: otherUserId }, {
+                    headers: {
+                        exp: keys.pubExp,
+                        key: keys.pubKey
+                    }
+                });
+                let data = Keys.decrypt(response.data, keys.priKey, keys.pubKey);
+
+                resolve(data);
             } catch (error) {
                 reject(error);
             }
