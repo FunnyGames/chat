@@ -39,7 +39,7 @@ const Registration = props => {
           <p>
             <input
               type="text"
-              id="email"
+              id="username"
               placeholder="Enter username"
               value={username}
               onChange={e => setUsername(e.target.value)}

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { ToastProvider } from 'react-toast-notifications'
 
 import { decrypt } from "../../utils/Des";
 import ChatSocketServer from "../../services/ChatSocketServer";
@@ -8,15 +7,13 @@ import ChatHttpServer from "../../services/ChatHttpServer";
 
 import ChatList from './chat-list/ChatList';
 import Conversation from './conversation/Conversation';
-import ToastContainer from './ToastContainer/ToastContainer'
-import { Navbar } from 'react-bootstrap';
 
 import "./Chat.scss";
 
 
 class Chat extends Component {
   _isMounted = false;
-  state = { loadingState: true, error: "", conversations: [], selectedConversation: null, messages: [], keys: [], currentKey: '' };
+  state = { loadingState: true, conversations: [], selectedConversation: null, messages: [], keys: [], currentKey: '' };
 
   componentDidMount() {
     this._isMounted = true;
@@ -140,7 +137,7 @@ class Chat extends Component {
       key = res.key;
     }
     if (this._isMounted) {
-      this.setState({ selectedConversation: conversation, currentKey: key });
+      this.setState({ selectedConversation: conversation, currentKey: key, error: '' });
     }
     this.getMessages(conversation);
   };
@@ -158,9 +155,6 @@ class Chat extends Component {
             messages: messageResponse.messages,
           });
         }
-        this.setState({
-          error: ""
-        });
       }
     } catch (error) {
       this.setState({
@@ -171,14 +165,12 @@ class Chat extends Component {
 
   sendMessage = (event) => {
     const message = event.target.value;
-    if (message === '' || message === undefined || message === null) {
+    if (message === '' || message === '\n' || message === undefined || message === null) {
       event.target.value = '';
     } else if (this.state.userId === '') {
       this.router.navigate(['/']);
     } else if (!this.state.selectedConversation) {
-      this.setState({
-        error: "Select a user to chat."
-      })
+      this.setState({ error: 'Select a user first' });
     } else {
       this.sendAndUpdateMessages({
         fromUserId: this.userId,
@@ -186,9 +178,7 @@ class Chat extends Component {
         toUserId: this.state.selectedConversation._id,
       });
       event.target.value = '';
-      this.setState({
-        error: ""
-      })
+      this.setState({ error: '' });
     }
   }
 
@@ -200,9 +190,6 @@ class Chat extends Component {
         this.setState({
           messages: [...this.state.messages, message]
         });
-        this.setState({
-          error: ""
-        })
       }
     } catch (error) {
       this.setState({
@@ -233,9 +220,6 @@ class Chat extends Component {
       });
       ChatSocketServer.eventEmitter.on('logout-response', (loggedOut) => {
         this.props.history.push(`/`);
-        this.setState({
-          error: ""
-        })
       });
     } catch (error) {
       this.setState({
@@ -247,47 +231,46 @@ class Chat extends Component {
 
   render() {
     return (
-      <ToastProvider components={{ ToastContainer: ToastContainer }} placement="bottom-center">
-        <div className="main">
-          <nav className="navbar navbar-dark bg-dark fixed-top">
-            <span className="navbar-brand mb-0 h1">
-              Welcome {this.state.username}
-            </span>
-            <button
-              className="btn btn-outline-danger my-2 my-sm-0"
-              onClick={this.logout}
-            >
-              Logout
+      <div className="main">
+        <nav className="navbar navbar-dark bg-dark fixed-top">
+          <span className="navbar-brand mb-0 h1">
+            Welcome {this.state.username}
+          </span>
+          <button
+            className="btn btn-outline-danger my-2 my-sm-0"
+            onClick={this.logout}
+          >
+            Logout
           </button>
-          </nav>
-          {this.state.loadingState ? (
-            <div className="ui segment">
-              <p></p>
-              <div className="ui active inverted dimmer">
-                <div className="ui loader"></div>
+        </nav>
+        {this.state.loadingState ? (
+          <div className="ui segment">
+            <p></p>
+            <div className="ui active inverted dimmer">
+              <div className="ui loader"></div>
+            </div>
+          </div>
+        ) : (
+            <div>
+              <div className="list">
+                <ChatList
+                  onConversationSelect={this.onConversationSelect}
+                  conversations={this.state.conversations}
+                  selectedConversation={this.state.selectedConversation}
+                />
+              </div>
+              <div className="chat">
+                <Conversation
+                  conversation={this.state.selectedConversation}
+                  messages={this.state.messages}
+                  userId={this.userId}
+                  sendMessage={this.sendMessage}
+                />
+                {this.state.error ? this.state.error : null}
               </div>
             </div>
-          ) : (
-              <div>
-                <div className="list">
-                  <ChatList
-                    onConversationSelect={this.onConversationSelect}
-                    conversations={this.state.conversations}
-                    selectedConversation={this.state.selectedConversation}
-                  />
-                </div>
-                <div className="chat">
-                  <Conversation
-                    conversation={this.state.selectedConversation}
-                    messages={this.state.messages}
-                    userId={this.userId}
-                    sendMessage={this.sendMessage}
-                  />
-                </div>
-              </div>
-            )}
-        </div>
-      </ToastProvider>
+          )}
+      </div>
     );
   }
 }

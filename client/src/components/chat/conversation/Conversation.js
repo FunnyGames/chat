@@ -1,21 +1,12 @@
-import React, { useEffect } from 'react';
-import ScrollableFeed from 'react-scrollable-feed'
+import React from 'react';
+import ScrollableFeed from 'react-scrollable-feed';
 import Message from './Message';
 import uuid from 'uuid';
-import { useToasts } from 'react-toast-notifications';
 
 import "./Conversation.css";
 import "../Chat.scss";
 
-const Conversation = ({ conversation, messages, userId, sendMessage, errorMessage }) => {
-    const { addToast } = useToasts();
-
-    useEffect(() => {
-        if (errorMessage !== "") {
-            addToast(errorMessage, { appearance: 'error', placement: 'bottom-center', autoDismiss: 'true' })
-        }
-    }, [errorMessage])
-
+const Conversation = ({ conversation, messages, userId, sendMessage }) => {
     const scrollToBottom = (event) => {
         if (event && event.key === 'Enter' && !event.shiftKey) {
             sendMessage(event);
