@@ -5,6 +5,7 @@ module.exports.JWT_COOKIE = 'jwt_blogger';
 module.exports.USER_NOT_FOUND = `User does not exits.`;
 module.exports.MESSAGE_NOT_FOUND = `Message can't be empty.`;
 module.exports.SELECT_USER = `Select a user to chat.`;
+module.exports.USER_ALREADY_LOGGED_IN = `You seem to be logged in from another place, please log out first`;
 
 // General Errors
 module.exports.MESSAGE_STORE_ERROR = `Could not store messages, server error.`;

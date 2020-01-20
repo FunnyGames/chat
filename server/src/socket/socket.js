@@ -75,7 +75,6 @@ function socketEvents(io) {
                     });
                     return;
                 }
-                console.log(toSocketId, data);
                 io.to(toSocketId).emit(`add-message-response`, data);
             }
         });
