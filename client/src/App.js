@@ -8,37 +8,6 @@ import NotFound from "./components/not-found/NotFound";
 import "./App.css";
 
 class App extends Component {
-  state = {};
-
-  async componentDidMount() {
-    let { userId, username } = await ChatHttpServer.getUser();
-    this.userId = userId;
-    if (!username) {
-      const response = await ChatHttpServer.userSessionCheck();
-      username = response.username;
-    }
-    const { keys } = await ChatHttpServer.getKeys();
-    if (this._isMounted) {
-      this.setState({
-        username: username,
-        keys: keys
-      });
-    }
-  }
-  logout = async () => {
-    try {
-      await ChatHttpServer.removeLS();
-      ChatSocketServer.logout({
-        userId: this.userId
-      });
-      ChatSocketServer.eventEmitter.on("logout-response", loggedOut => {
-        this.props.history.push(`/`);
-      });
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  };
   render() {
     return (
       <Router>
