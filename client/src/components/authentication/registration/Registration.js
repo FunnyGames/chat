@@ -29,12 +29,12 @@ const Registration = props => {
 
   return (
     <div className="container">
-      {error.trim() !== "" ? <p>{error}</p> : null}
       <div className="background-wrap">
         <div className="background"></div>
       </div>
       <form id="accesspanel">
         <h1 id="litheader">Register</h1>
+
         <div className="inset">
           <p>
             <input
@@ -57,6 +57,7 @@ const Registration = props => {
             />
           </p>
         </div>
+        {error.trim() !== "" ? <p className="errorText"> {error}</p> : null}
         <p className="p-container">
           <button id="go" name="Login" onClick={handleRegistration}>
             Register

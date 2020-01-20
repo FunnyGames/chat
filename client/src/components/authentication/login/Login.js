@@ -58,7 +58,7 @@ const Login = props => {
             />
           </p>
         </div>
-        {error.trim() !== "" ? <p className="p-container">{error}</p> : null}
+        {error.trim() !== "" ? <p className="errorText">{error}</p> : null}
         <p className="p-container">
           <button id="go" name="Login" onClick={handleLogin}>
             Login
