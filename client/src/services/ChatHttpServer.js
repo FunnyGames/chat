@@ -153,7 +153,7 @@ class ChatHttpServer {
                         key: keys.pubKey
                     }
                 });
-                let data = Keys.decrypt(response.data, keys.priKey, keys.pubKey);
+                let data = Keys.decrypt(response.data.msg, keys.priKey, keys.pubKey);
 
                 resolve(data);
             } catch (error) {
