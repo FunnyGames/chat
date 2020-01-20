@@ -24,25 +24,24 @@ class Chat extends Component {
     async connectToSocket() {
         try {
             this.setRenderLoadingState(true);
-            this.userId = await ChatHttpServer.getUserId();
-            let { keys } = await ChatHttpServer.getKeys();
-            const response = await ChatHttpServer.userSessionCheck();
-            if (response.error) {
-                this.props.history.push(`/`)
-            } else {
-                this.setState({
-                    username: response.username,
-                    keys: keys
-                });
-                ChatHttpServer.setLS('username', response.username);
-                ChatSocketServer.establishSocketConnection(this.userId);
-                ChatSocketServer.getChatList(this.userId);
+            let { userId, username } = await ChatHttpServer.getUser();
+            this.userId = userId;
+            if (!username) {
+                const response = await ChatHttpServer.userSessionCheck();
+                username = response.username;
             }
+            const { keys } = await ChatHttpServer.getKeys();
+            this.setState({
+                username: username,
+                keys: keys
+            });
+            ChatHttpServer.setLS('username', username);
+            ChatSocketServer.establishSocketConnection(this.userId);
+            ChatSocketServer.getChatList(this.userId);
             this.setRenderLoadingState(false);
         } catch (error) {
             console.log(error.response);
             this.setRenderLoadingState(false);
-            this.props.history.push(`/`)
         }
     }
 
@@ -55,7 +54,7 @@ class Chat extends Component {
     addUserToChatList = (user) => {
         let count = this.state.conversations.filter(u => u._id === user.info._id);
         let conversations;
-        if (count === 0) {
+        if (count.length === 0) {
             conversations = [...this.state.conversations, user.info];
         } else {
             conversations = [...this.state.conversations];
@@ -100,7 +99,8 @@ class Chat extends Component {
     onConversationSelect = async conversation => {
         let key = this.checkKeys(conversation._id);
         if (!key) {
-            key = await ChatHttpServer.getKey(conversation._id);
+            let res = await ChatHttpServer.getKey(conversation._id);
+            key = res.key;
         }
         this.setState({ selectedConversation: conversation, currentKey: key });
         this.getMessages(conversation);
@@ -132,22 +132,20 @@ class Chat extends Component {
     }
 
     sendMessage = (event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            const message = event.target.value;
-            if (message === '' || message === undefined || message === null) {
-                event.target.value = '';
-            } else if (this.state.userId === '') {
-                this.router.navigate(['/']);
-            } else if (!this.state.selectedConversation) {
-                alert(`Select a user to chat.`);
-            } else {
-                this.sendAndUpdateMessages({
-                    fromUserId: this.userId,
-                    message: (message).trim(),
-                    toUserId: this.state.selectedConversation._id,
-                });
-                event.target.value = '';
-            }
+        const message = event.target.value;
+        if (message === '' || message === undefined || message === null) {
+            event.target.value = '';
+        } else if (this.state.userId === '') {
+            this.router.navigate(['/']);
+        } else if (!this.state.selectedConversation) {
+            alert(`Select a user to chat.`);
+        } else {
+            this.sendAndUpdateMessages({
+                fromUserId: this.userId,
+                message: (message).trim(),
+                toUserId: this.state.selectedConversation._id,
+            });
+            event.target.value = '';
         }
     }
 
@@ -164,6 +162,10 @@ class Chat extends Component {
     }
 
     updateMessage = (message) => {
+        let c = this.state.selectedConversation;
+        if (!c || message.fromUserId !== c._id) {
+            return;
+        }
         message.message = decrypt(this.state.currentKey, message.message);
         this.setState({
             messages: [...this.state.messages, message]

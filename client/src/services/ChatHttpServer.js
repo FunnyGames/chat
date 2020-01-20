@@ -4,10 +4,12 @@ axios.defaults.withCredentials = true;
 
 class ChatHttpServer {
 
-    getUserId() {
+    getUser() {
         return new Promise((resolve, reject) => {
             try {
-                resolve(localStorage.getItem('userid'));
+                let userId = localStorage.getItem('userid');
+                let username = localStorage.getItem('username');
+                resolve({ userId, username });
             } catch (error) {
                 reject(error);
             }

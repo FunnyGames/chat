@@ -90,7 +90,7 @@ function des(key, message, encrypt, padding) {
 // this takes as input a 64 bit key (even though only 56 bits are used)
 // as an array of 2 integers, and returns 16 48 bit keys
 function des_createKeys(key) {
-    //declaring this locally speeds things up a bit
+    // declaring this locally speeds things up a bit
     let pc2bytes0 = [0, 0x4, 0x20000000, 0x20000004, 0x10000, 0x10004, 0x20010000, 0x20010004, 0x200, 0x204, 0x20000200, 0x20000204, 0x10200, 0x10204, 0x20010200, 0x20010204];
     let pc2bytes1 = [0, 0x1, 0x100000, 0x100001, 0x4000000, 0x4000001, 0x4100000, 0x4100001, 0x100, 0x101, 0x100100, 0x100101, 0x4000100, 0x4000101, 0x4100100, 0x4100101];
     let pc2bytes2 = [0, 0x8, 0x800, 0x808, 0x1000000, 0x1000008, 0x1000800, 0x1000808, 0, 0x8, 0x800, 0x808, 0x1000000, 0x1000008, 0x1000800, 0x1000808];
@@ -106,13 +106,13 @@ function des_createKeys(key) {
     let pc2bytes12 = [0, 0x1000, 0x8000000, 0x8001000, 0x80000, 0x81000, 0x8080000, 0x8081000, 0x10, 0x1010, 0x8000010, 0x8001010, 0x80010, 0x81010, 0x8080010, 0x8081010];
     let pc2bytes13 = [0, 0x4, 0x100, 0x104, 0, 0x4, 0x100, 0x104, 0x1, 0x5, 0x101, 0x105, 0x1, 0x5, 0x101, 0x105];
 
-    //how many iterations (1 for des, 3 for triple des)
-    var iterations = key.length > 8 ? 3 : 1; //changed by Paul 16/6/2007 to use Triple DES for 9+ byte keys
-    //stores the return keys
+    // how many iterations (1 for des, 3 for triple des)
+    var iterations = key.length > 8 ? 3 : 1;
+    // stores the return keys
     var keys = [32 * iterations];
-    //now define the left shifts which need to be done
+    // now define the left shifts which need to be done
     var shifts = [0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0];
-    //other variables
+    // other variables
     var lefttemp, righttemp, m = 0, n = 0, temp;
 
     for (var j = 0; j < iterations; j++) { //either 1 or 3 iterations
@@ -127,23 +127,23 @@ function des_createKeys(key) {
         temp = ((right >>> 8) ^ left) & 0x00ff00ff; left ^= temp; right ^= (temp << 8);
         temp = ((left >>> 1) ^ right) & 0x55555555; right ^= temp; left ^= (temp << 1);
 
-        //the right side needs to be shifted and to get the last four bits of the left side
+        // the right side needs to be shifted and to get the last four bits of the left side
         temp = (left << 8) | ((right >>> 20) & 0x000000f0);
-        //left needs to be put upside down
+        // left needs to be put upside down
         left = (right << 24) | ((right << 8) & 0xff0000) | ((right >>> 8) & 0xff00) | ((right >>> 24) & 0xf0);
         right = temp;
 
-        //now go through and perform these shifts on the left and right keys
+        // now go through and perform these shifts on the left and right keys
         for (let i = 0; i < shifts.length; i++) {
-            //shift the keys either one or two bits to the left
+            // shift the keys either one or two bits to the left
             if (shifts[i]) { left = (left << 2) | (left >>> 26); right = (right << 2) | (right >>> 26); }
             else { left = (left << 1) | (left >>> 27); right = (right << 1) | (right >>> 27); }
             left &= -0xf; right &= -0xf;
 
-            //now apply PC-2, in such a way that E is easier when encrypting or decrypting
-            //this conversion will look like PC-2 except only the last 6 bits of each byte are used
-            //rather than 48 consecutive bits and the order of lines will be according to 
-            //how the S selection functions will be applied: S2, S4, S6, S8, S1, S3, S5, S7
+            // now apply PC-2, in such a way that E is easier when encrypting or decrypting
+            // this conversion will look like PC-2 except only the last 6 bits of each byte are used
+            // rather than 48 consecutive bits and the order of lines will be according to 
+            // how the S selection functions will be applied: S2, S4, S6, S8, S1, S3, S5, S7
             lefttemp = pc2bytes0[left >>> 28] | pc2bytes1[(left >>> 24) & 0xf]
                 | pc2bytes2[(left >>> 20) & 0xf] | pc2bytes3[(left >>> 16) & 0xf]
                 | pc2bytes4[(left >>> 12) & 0xf] | pc2bytes5[(left >>> 8) & 0xf]
@@ -155,7 +155,7 @@ function des_createKeys(key) {
             temp = ((righttemp >>> 16) ^ lefttemp) & 0x0000ffff;
             keys[n++] = lefttemp ^ temp; keys[n++] = righttemp ^ (temp << 16);
         }
-    } //for each iterations
+    }
     //return the keys we've created
     return keys;
 }
