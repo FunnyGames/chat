@@ -11,15 +11,21 @@ import Conversation from './conversation/Conversation';
 import './Chat.css';
 
 class Chat extends Component {
+    _isMounted = false;
     state = { loadingState: true, conversations: [], selectedConversation: null, messages: [], keys: [], currentKey: '' };
 
     componentDidMount() {
+        this._isMounted = true;
         this.connectToSocket();
         ChatSocketServer.eventEmitter.on('chat-list-response', this.createChatListUsers);
         ChatSocketServer.eventEmitter.on('chat-list-new-user', this.addUserToChatList);
         ChatSocketServer.eventEmitter.on('chat-list-user-logout', this.userLogoutEvent);
         ChatSocketServer.eventEmitter.on('add-message-response', this.updateMessage);
     }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+      }
 
     async connectToSocket() {
         try {
@@ -31,10 +37,12 @@ class Chat extends Component {
                 username = response.username;
             }
             const { keys } = await ChatHttpServer.getKeys();
-            this.setState({
-                username: username,
-                keys: keys
-            });
+            if(this._isMounted){
+                this.setState({
+                    username: username,
+                    keys: keys
+                });
+            }
             ChatHttpServer.setLS('username', username);
             ChatSocketServer.establishSocketConnection(this.userId);
             ChatSocketServer.getChatList(this.userId);
@@ -46,9 +54,11 @@ class Chat extends Component {
     }
 
     createChatListUsers = (chatListResponse) => {
-        this.setState({
-            conversations: chatListResponse.chatList
-        });
+        if(this._isMounted){
+            this.setState({
+                conversations: chatListResponse.chatList
+            });
+        }
     }
 
     addUserToChatList = (user) => {
@@ -66,7 +76,9 @@ class Chat extends Component {
                 }
             }
         }
-        this.setState({ conversations });
+        if(this._isMounted){
+            this.setState({ conversations });
+        }
     }
 
     userLogoutEvent = (user) => {
@@ -78,13 +90,17 @@ class Chat extends Component {
                 break;
             }
         }
-        this.setState({
-            conversations: conversations
-        });
+        if(this._isMounted){
+            this.setState({
+                conversations: conversations
+            });
+        }
     }
 
     setRenderLoadingState = loadingState => {
-        this.setState({ loadingState });
+        if(this._isMounted){
+            this.setState({ loadingState });
+        }
     }
 
     checkKeys = (userId) => {
@@ -102,7 +118,9 @@ class Chat extends Component {
             let res = await ChatHttpServer.getKey(conversation._id);
             key = res.key;
         }
-        this.setState({ selectedConversation: conversation, currentKey: key });
+        if(this._isMounted){
+            this.setState({ selectedConversation: conversation, currentKey: key });
+        }
         this.getMessages(conversation);
     };
 
@@ -114,9 +132,11 @@ class Chat extends Component {
                     let msg = messageResponse.messages[i];
                     msg.message = decrypt(this.state.currentKey, msg.message);
                 }
-                this.setState({
-                    messages: messageResponse.messages,
-                });
+                if(this._isMounted){
+                    this.setState({
+                        messages: messageResponse.messages,
+                    });
+                }
                 // this.scrollMessageContainer();
             } else {
                 alert('Unable to fetch messages');
@@ -153,9 +173,11 @@ class Chat extends Component {
         try {
             let key = this.state.currentKey;
             ChatSocketServer.sendMessage(key, message);
-            this.setState({
-                messages: [...this.state.messages, message]
-            });
+            if(this._isMounted){
+                this.setState({
+                    messages: [...this.state.messages, message]
+                });
+            }
         } catch (error) {
             console.log(error);
         }
@@ -167,9 +189,11 @@ class Chat extends Component {
             return;
         }
         message.message = decrypt(this.state.currentKey, message.message);
-        this.setState({
-            messages: [...this.state.messages, message]
-        });
+        if(this._isMounted){
+            this.setState({
+                messages: [...this.state.messages, message]
+            });
+        }
     }
 
     logout = async () => {
