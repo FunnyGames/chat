@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { useToasts } from 'react-toast-notifications'
+import React from 'react';
 
 import './ToastContainer.css';
 

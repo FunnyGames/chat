@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { ToastProvider, DefaultToast  } from 'react-toast-notifications'
+import { ToastProvider } from 'react-toast-notifications'
 
 import { decrypt } from '../../utils/Des';
 import ChatSocketServer from '../../services/ChatSocketServer';
@@ -51,7 +51,9 @@ class Chat extends Component {
             ChatSocketServer.getChatList(this.userId);
             this.setRenderLoadingState(false);
         } catch (error) {
-            console.log(error.response);
+            this.setState({
+                error: error.response
+            })
             this.setRenderLoadingState(false);
             this.props.history.push('/');
         }
@@ -145,23 +147,14 @@ class Chat extends Component {
                 this.setState({
                     error: ""
                 });
-                // this.scrollMessageContainer();
-            } else {
-                this.setState({
-                    error: "Unable to fetch messages"
-                })
-                //alert('Unable to fetch messages');
             }
-            // this.setState({
-            //     messageLoading: false
-            // });
         } catch (error) {
-            // this.setState({
-            //     messageLoading: false
-            // });
+            this.setState({
+                error: error.response
+            })
         }
     }
-
+    
     sendMessage = (event) => {
         const message = event.target.value;
         if (message === '' || message === undefined || message === null) {
@@ -172,7 +165,6 @@ class Chat extends Component {
             this.setState({
                 error: "Select a user to chat."
             })
-            //alert(`Select a user to chat.`);
         } else {
             this.sendAndUpdateMessages({
                 fromUserId: this.userId,
@@ -194,9 +186,14 @@ class Chat extends Component {
                 this.setState({
                     messages: [...this.state.messages, message]
                 });
+                this.setState({
+                    error: ""
+                })
             }
         } catch (error) {
-            console.log(error);
+            this.setState({
+                error: error.response
+            })
         }
     }
 
@@ -221,9 +218,14 @@ class Chat extends Component {
             });
             ChatSocketServer.eventEmitter.on('logout-response', (loggedOut) => {
                 this.props.history.push(`/`);
+                this.setState({
+                    error: ""
+                })
             });
         } catch (error) {
-            console.log(error);
+            this.setState({
+                error: error.response
+            })
             throw error;
         }
     }

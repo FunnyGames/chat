@@ -2,17 +2,16 @@ import React, { useEffect } from 'react';
 import ScrollableFeed from 'react-scrollable-feed'
 import Message from './Message';
 import uuid from 'uuid';
-import { useToasts } from 'react-toast-notifications'
+import { useToasts } from 'react-toast-notifications';
 
 import './Conversation.css';
-
 
 const Conversation = ({ conversation, messages, userId, sendMessage, errorMessage }) => {
     const { addToast } = useToasts();
 
     useEffect(() =>{
         if(errorMessage !== ""){
-            addToast(errorMessage , { appearance: 'error', placement : 'bottom-center'})
+            addToast(errorMessage , { appearance: 'error', placement : 'bottom-center', autoDismiss :'true'})
         }
     },[errorMessage])
 
