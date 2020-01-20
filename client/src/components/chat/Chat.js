@@ -12,7 +12,7 @@ import './Chat.css';
 
 class Chat extends Component {
     _isMounted = false;
-    state = { loadingState: true, conversations: [], selectedConversation: null, messages: [], keys: [], currentKey: '' };
+    state = { loadingState: true,error: "", conversations: [], selectedConversation: null, messages: [], keys: [], currentKey: '' };
 
     componentDidMount() {
         this._isMounted = true;
@@ -137,9 +137,15 @@ class Chat extends Component {
                         messages: messageResponse.messages,
                     });
                 }
+                this.setState({
+                    error: ""
+                });
                 // this.scrollMessageContainer();
             } else {
-                alert('Unable to fetch messages');
+                this.setState({
+                    error: "Unable to fetch messages"
+                })
+                //alert('Unable to fetch messages');
             }
             // this.setState({
             //     messageLoading: false
@@ -158,7 +164,10 @@ class Chat extends Component {
         } else if (this.state.userId === '') {
             this.router.navigate(['/']);
         } else if (!this.state.selectedConversation) {
-            alert(`Select a user to chat.`);
+            this.setState({
+                error: "Select a user to chat."
+            })
+            //alert(`Select a user to chat.`);
         } else {
             this.sendAndUpdateMessages({
                 fromUserId: this.userId,
@@ -166,6 +175,9 @@ class Chat extends Component {
                 toUserId: this.state.selectedConversation._id,
             });
             event.target.value = '';
+            this.setState({
+                error: ""
+            })
         }
     }
 
@@ -240,6 +252,7 @@ class Chat extends Component {
                                         messages={this.state.messages}
                                         userId={this.userId}
                                         sendMessage={this.sendMessage}
+                                        errorMessage={this.state.error}
                                     />
                                 </div>
                             </div>

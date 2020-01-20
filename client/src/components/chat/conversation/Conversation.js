@@ -4,7 +4,7 @@ import Message from './Message';
 
 import './Conversation.css';
 
-const Conversation = ({ conversation, messages, userId, sendMessage }) => {
+const Conversation = ({ conversation, messages, userId, sendMessage, errorMessage }) => {
 
     const scrollToBottom = (event) => {
         if (event && event.key === 'Enter' && !event.shiftKey) {
@@ -42,6 +42,7 @@ const Conversation = ({ conversation, messages, userId, sendMessage }) => {
                     </ScrollableFeed>
                 </div>
             </div>
+            {errorMessage !== ""?<p>sdfsdfsd</p> : null}
             <form className="ui reply form">
                 <div className="field">
                     <textarea rows="2" placeholder="Write here and press enter to send..." onKeyUp={scrollToBottom}></textarea>
