@@ -9,9 +9,9 @@ var cors = require('cors');
 module.exports = (app) => {
     // This allows for any hostname to connect
     var corsOptions = {
-        origin: function (origin, callback) {
-            callback(null, true);
-        }
+        credentials: true,
+        origin: 'http://localhost:3000',
+        optionsSuccessStatus: 200
     }
     app.use(cors(corsOptions));
 
